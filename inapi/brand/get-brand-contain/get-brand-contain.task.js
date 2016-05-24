@@ -93,11 +93,26 @@ getBrandContain.main(function (task, http, params) {
     hashes = body.substring(0, fin).split('\',\'');
 
     formData = {
-      'Hash': hashes[0], 'IDW': hashes[1],
-      'LastNumSol': '0', 'param1': '', 'param2': '',
-      'param3': brand, 'param4': '', 'param5': '', 'param6': '', 'param7': '', 'param8': '',
-      'param9': '', 'param10': '', 'param11': '', 'param12': '', 'param13': '',
-      'param14': '', 'param15': '', 'param16': '', 'param17': '2'
+      'Hash': hashes[0],
+      'IDW': hashes[1],
+      'LastNumSol': '0',
+      'param1': '',
+      'param2': '',
+      'param3': brand,
+      'param4': '',
+      'param5': '',
+      'param6': '',
+      'param7': '',
+      'param8': '',
+      'param9': '',
+      'param10': '',
+      'param11': '',
+      'param12': '',
+      'param13': '',
+      'param14': '',
+      'param15': '',
+      'param16': '',
+      'param17': '2'
     };
 
     requestOpts = template.build({
@@ -109,7 +124,7 @@ getBrandContain.main(function (task, http, params) {
   })
 
   .then(function (result) {
-    var str2find, promiseChain;
+    var str2find, promiseChain, newHash;
 
     if (result.res.statusCode === 200) {
       result = JSON.parse(result.body.d);
@@ -124,7 +139,7 @@ getBrandContain.main(function (task, http, params) {
     } else if (result.Marcas.length === 0) {
       task.success(count);
     } else {
-      var newHash = result.Hash;
+      newHash = result.Hash;
       count.disponible = false;
       promiseChain = Q.resolve(count);
       result = _.pluck(result.Marcas, 'id');
@@ -147,6 +162,10 @@ getBrandContain.main(function (task, http, params) {
 
           return http.post(request).then(function (requestResult) {
             result = JSON.parse(requestResult.body.d);
+
+            if (typeof result.ErrorMessage === 'string') {
+              return count;
+            }
 
             newHash = result.Hash;
             result = result.Marca;
