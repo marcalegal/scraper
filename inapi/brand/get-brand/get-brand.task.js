@@ -107,7 +107,7 @@ getBrandExact.main(function (task, http, params) {
   })
 
   .then(function (result) {
-    var str2find, promiseChain;
+    var str2find, promiseChain, newHash;
 
     if (result.res.statusCode === 200) {
       result = JSON.parse(result.body.d);
@@ -122,7 +122,7 @@ getBrandExact.main(function (task, http, params) {
     } else if (result.Marcas.length === 0) {
       task.success(count);
     } else {
-      var newHash = result.Hash;
+      newHash = result.Hash;
       count.disponible = false;
       promiseChain = Q.resolve(count);
       result = _.pluck(result.Marcas, 'id');
@@ -145,6 +145,10 @@ getBrandExact.main(function (task, http, params) {
 
           return http.post(request).then(function (requestResult) {
             result = JSON.parse(requestResult.body.d);
+
+            if (typeof result.ErrorMessage === 'string') {
+              return count;
+            }
 
             newHash = result.Hash;
             result = result.Marca;
